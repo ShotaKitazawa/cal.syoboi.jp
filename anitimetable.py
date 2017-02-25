@@ -26,14 +26,21 @@ class TimeTable:
         for program in programs:
             sys.stdout.write(program["title"] + "\n")
 
-    def now_program(self):
+    def now_program(self, tweet="_"):
         soup = self._return_soup()
         programs = soup.find("td", {"class": "v3dayCell v3cellR "}).find_all("div", {"class": "pid-item v3div"})
         for program in programs:
             if self._time_check(program, 0, 0):
-                if self._broadcaster_check(program) != "_":
+                broadcaster_check = self._broadcaster_check(program)
+                if broadcaster_check != "_":
                     message = "放送中です。"
-                    self._tweet_with_picture(program, self._broadcaster_check(program), message)
+                    if tweet.lower() == "tweet":
+                        self._tweet_with_picture(program, broadcaster_check, message)
+                    else:
+                        title = program.find("a", {"class": "v3title"}).text
+                        atime = program["title"]
+                        weekday = self._check_weekday()
+                        print(title + "\n" + broadcaster_check + ": " + weekday + " " + atime + "\n" + "\n" + message)
 
     def _time_check(self, program, *time_ago):  # *time_age = [時,分]
         regex = "^([0-9]{2}):([0-9]{2})-([0-9]{2}):([0-9]{2}).*$"
@@ -110,29 +117,3 @@ class TimeTable:
         for i in escape_list:
             title = title.replace(i, " ")
         return title
-
-
-def main():
-    broadcaster_list = [
-        "NHK Eテレ",
-        "日本テレビ",
-        "テレビ朝日",
-        "TBS",
-        "テレビ東京",
-        "フジテレビ",
-        "TOKYO MX",
-        "AT-X",
-    ]
-    C= "8K6BcNqg1OHPh2t2CZLOlxuDb"
-    CO= "S4W13zYtG6GjH7xzaSQlVbUgx4h0sNVAkWPBUIZBdnsICQ7h02"
-    A= "830059724624125952-faRkknQmBtleYPfV8XjeOS3aiLLFmI8"
-    AC= "COv4C7HiUda1JltjvYus4ePhDXzKrpWKhQ8o6XYVrZK4k"
-    now = datetime.datetime.now()
-    Today_timetable = TimeTable(now, broadcaster_list,C,CO,A,AC)
-    # Today_timetable.show_all()
-    Today_timetable.now_program()
-    # Today_timetable._return_soup()
-
-
-if __name__ == "__main__":
-    main()
