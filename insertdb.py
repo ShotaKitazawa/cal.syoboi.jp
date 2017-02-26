@@ -135,7 +135,6 @@ def scrape_and_insert_db(url, season):
         for j in onairs_times:
             onair_time = j
             onair_time_list = onair_time.split(",")
-            print(j)
             c.execute('select anime_id from broadcast_time where anime_id = {0};'.format(anime_id))
             if len(c.fetchall()) == 0:
                 c.execute('select broadcaster_id from broadcaster where name = "{0}";'.format(onair_time_list[0]))
@@ -154,10 +153,10 @@ def scrape_and_insert_db(url, season):
             c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
 
         image_url = contents[i].find("div", {"class": "itemImg"}).find("img")['src']
-        if image_exist(title_escaped):
+        if image_exist(title):
             sys.stdout.write("{0} image have already existed.\n".format(title))
         else:
-            download_image(image_url, title_escaped)
+            download_image(image_url, title)
 
     con.commit()
     c.close()
@@ -174,6 +173,7 @@ def mkdir():
 def image_exist(title):
     c.execute('select anime_id from anime where title = "{0}"'.format(title))
     anime_id = c.fetchall()[0][0]
+    print(anime_id)
     if (os.path.exists("{0}/.images/{1}.jpg".format(os.path.expanduser('~'), anime_id))):
         return True
     else:
@@ -225,13 +225,6 @@ def escaping(name):
     for i in escape_list:
         name = name.replace(i, " ")
     return name
-
-
-def title_escaping(name):
-    escape_list = ['\\', '/', ':', '*', '?', '"', '>', '<', '|']
-    for i in escape_list:
-        title = title.replace(i, " ")
-    return title
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ import requests
 import tweepy
 
 
-class TimeTable:
+class AniTimeTable:
 
     def __init__(self, time, broadcaster_list, CONSUMER_KEY="_", CONSUMER_SECRET="_", ACCESS_TOKEN="_", ACCESS_TOKEN_SECRET="_"):
         if not isinstance(time, datetime.datetime):
