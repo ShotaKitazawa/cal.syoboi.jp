@@ -14,7 +14,7 @@ class AniTimeTable:
             sys.stderr.write('Error: usage: class initialized error: argment type is not datetime.datetime\n')
             return
         self.time = time
-        self.url = "http://cal.syoboi.jp/"
+        self.url = "http://cal.syoboi.jp"
         self.broadcaster = broadcaster_list
         auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -22,13 +22,32 @@ class AniTimeTable:
         self.connection = DB_CONNECTION
 
     def show_all(self):
-        soup = self._return_soup()
+        soup = self._return_soup("/?date=" + self.time.strftime("%Y/%m/%d"))
         programs = soup.find("td", {"class": "v3dayCell v3cellR "}).find_all("div", {"class": "pid-item v3div"})
         for program in programs:
             sys.stdout.write(program["title"] + "\n")
 
+    def insert_db(self):
+        titlelist_id = {
+            "1",  # 放送中アニメ
+            # "2", # ラジオ
+            # "3", # ドラマ
+            # "4", # 特撮
+            # "5", # アニメ関連
+            # "7", # OVA
+            # "8", # 映画
+            # "10", # 放送終了アニメ
+        }
+        for i in titlelist_id:
+            soup = self._return_soup("/list?cat={0}".format(i))
+            titlelist = soup.find("table", {"class": "TitleList TableColor"})
+            title_url = titlelist.find_all("a")
+            for j in title_url:
+                soup = self._return_soup(j["href"])
+                # section staff, section op, section ed, section cast の抽出
+
     def now_program(self, tweet="_"):
-        soup = self._return_soup()
+        soup = self._return_soup("/?date=" + self.time.strftime("%Y/%m/%d"))
         programs = soup.find("td", {"class": "v3dayCell v3cellR "}).find_all("div", {"class": "pid-item v3div"})
         for program in programs:
             if self._time_check(program, 0, 0):
@@ -70,8 +89,8 @@ class AniTimeTable:
                 return i
         return "_"
 
-    def _return_soup(self):
-        response = requests.get(self.url + "?date=" + self.time.strftime("%Y/%m/%d"))
+    def _return_soup(self, path):
+        response = requests.get(self.url + path)
         if response.status_code == 404:
             sys.stderr.write('Error: usage: URL page notfound.\n')
             return
