@@ -40,11 +40,33 @@ class AniTimeTable:
         }
         for i in titlelist_id:
             soup = self._return_soup("/list?cat={0}".format(i))
-            titlelist = soup.find("table", {"class": "TitleList TableColor"})
-            title_url = titlelist.find_all("a")
+            title_list = soup.find("table", {"class": "TitleList TableColor"})
+            title_url = title_list.find_all("a")
             for j in title_url:
+                title = j.text
                 soup = self._return_soup(j["href"])
-                # section staff, section op, section ed, section cast の抽出
+                staffs = soup.find("table", {"class": "section staff"}).find("table", {"class": "data"}).find_all("tr")
+                print (type(title))
+                print ("==" + title + "==")
+
+                if staffs is not None:
+                    self._tidpage_section_insert(staffs, ["原作", "監督", "制作"])
+                op_list = soup.find_all("table", {"class": "section op"})
+                for ops in op_list:
+                    pass
+                ed_list = soup.find_all("table", {"class": "section ed"})
+                for eds in ed_list:
+                    pass
+
+                    # section staff, section op, section ed, section cast の抽出
+
+    def _tidpage_section_insert(self, contents, insertlist):
+        for i in contents:
+            for j in insertlist:
+                if re.match("^(.+・|){0}(・.+|)$".format(j), i.find("th").text):
+                    print (i.find("th").text)
+
+
 
     def now_program(self, tweet="_"):
         soup = self._return_soup("/?date=" + self.time.strftime("%Y/%m/%d"))
@@ -73,10 +95,10 @@ class AniTimeTable:
             if end_hour >= 6:
                 end_time = datetime.datetime(self.time.year, self.time.month, self.time.day, end_hour, end_minute, 0)
             else:
-                end_time = datetime.datetime(self.time.year, self.time.month, self.time.day + 1, end_hour, end_minute, 0)
+                end_time = datetime.datetime(self.time.year, self.time.month, self.time.day - 1, end_hour, end_minute, 0)
         else:
-            start_time = datetime.datetime(self.time.year, self.time.month, self.time.day + 1, start_hour, start_minute, 0)
-            end_time = datetime.datetime(self.time.year, self.time.month, self.time.day + 1, end_hour, end_minute, 0)
+            start_time = datetime.datetime(self.time.year, self.time.month, self.time.day - 1, start_hour, start_minute, 0)
+            end_time = datetime.datetime(self.time.year, self.time.month, self.time.day - 1, end_hour, end_minute, 0)
         check_time = self.time + datetime.timedelta(hours=time_ago[0]) + datetime.timedelta(minutes=time_ago[1])
         if start_time <= check_time and check_time < end_time:
             return True
