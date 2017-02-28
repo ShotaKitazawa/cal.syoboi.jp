@@ -45,12 +45,11 @@ class AniTimeTable:
             for j in title_url:
                 title = j.text
                 soup = self._return_soup(j["href"])
-                staffs = soup.find("table", {"class": "section staff"}).find("table", {"class": "data"}).find_all("tr")
-                print (type(title))
-                print ("==" + title + "==")
-
-                if staffs is not None:
+                try:
+                    staffs = soup.find("table", {"class": "section staff"}).find("table", {"class": "data"}).find_all("tr")
                     self._tidpage_section_insert(staffs, ["原作", "監督", "制作"])
+                except:
+                    print ("{0}: Contents is None.".format(title))
                 op_list = soup.find_all("table", {"class": "section op"})
                 for ops in op_list:
                     pass
@@ -64,6 +63,7 @@ class AniTimeTable:
         for i in contents:
             for j in insertlist:
                 if re.match("^(.+・|){0}(・.+|)$".format(j), i.find("th").text):
+                    #DBへのinsert処理
                     print (i.find("th").text)
 
 
