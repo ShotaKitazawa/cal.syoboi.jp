@@ -44,29 +44,49 @@ class AniTimeTable:
             title_url = title_list.find_all("a")
             for j in title_url:
                 title = j.text
+                print("== " + title + " ==")
                 soup = self._return_soup(j["href"])
                 try:
-                    staffs = soup.find("table", {"class": "section staff"}).find("table", {"class": "data"}).find_all("tr")
-                    self._tidpage_section_insert(staffs, ["原作", "監督", "制作"])
-                except:
-                    print ("{0}: Contents is None.".format(title))
-                op_list = soup.find_all("table", {"class": "section op"})
-                for ops in op_list:
-                    pass
-                ed_list = soup.find_all("table", {"class": "section ed"})
-                for eds in ed_list:
-                    pass
+                    staff_list = soup.find_all("table", {"class": "section staff"})
+                    for staffs in staff_list:
+                        staff_data = staffs.find("table", {"class": "data"}).find_all("tr")
+                        self._tidpage_section_insert(staff_data, [["原作", "writer"], ["監督", "director"], ["制作", "brand"]])
 
-                    # section staff, section op, section ed, section cast の抽出
+                    op_list = soup.find_all("table", {"class": "section op"})
+                    for ops in op_list:
+                        op_title = ops.find("div", {"class": "title"}).text
+                        op_data = ops.find("table", {"class": "data"}).find_all("tr")
+                        self._tidpage_section_insert(op_data, [["歌", "op", op_title]])
 
-    def _tidpage_section_insert(self, contents, insertlist):
-        for i in contents:
-            for j in insertlist:
-                if re.match("^(.+・|){0}(・.+|)$".format(j), i.find("th").text):
-                    #DBへのinsert処理
-                    print (i.find("th").text)
+                    ed_list = soup.find_all("table", {"class": "section ed"})
+                    for eds in ed_list:
+                        ed_title = eds.find("div", {"class": "title"}).text
+                        ed_data = eds.find("table", {"class": "data"}).find_all("tr")
+                        self._tidpage_section_insert(ed_data, [["歌", "ed", ed_title]])
+                except Exception as error:
+                    print(error)
 
+    def _tidpage_section_insert(self, sections, insertlists):
+        for i in sections:
+            for j in insertlists:
+                if re.match("^(.+・|){0}(・.+|)$".format(j[0]), i.find("th").text):
+                    # DBへのinsert処理
+                    schema = re.sub(r"^(.+・|)({0})(・.+|)$".format(j[0]), r"\2", i.find("th").text)
+                    contents = i.find_all("a", {"class": "keyword nobr"})
+                    if len(contents) == 0:
+                        contents = i.find_all("a", {"class": "keyword"})
+                    for content in contents:
+                        if j[1] == "op" or j[1] == "ed":
+                            pass
+                            # songer テーブルへの insert
+                            # op|ed テーブルへの insert
+                        else:
+                            pass
+                            # insertlists[1] テーブルへの insert
+                        # anime_{}.format(insertlists[1]) テーブルへの insert
+                        print(schema + ": " + content.text)
 
+                    insertlists.remove(j)
 
     def now_program(self, tweet="_"):
         soup = self._return_soup("/?date=" + self.time.strftime("%Y/%m/%d"))

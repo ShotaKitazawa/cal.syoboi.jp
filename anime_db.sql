@@ -15,11 +15,49 @@ drop table if exists userreview;
 drop table if exists userhighlight;
 
 create table anime(
-	anime_id int, title varchar(64), about varchar(512), 
-	brand varchar(32), writer varchar(32), 
-	director varchar(32), op varchar(32), ed varchar(32), 
+	anime_id int, title varchar(64), 
 	official_site varchar(2083), official_twitter varchar(2083), 
 	PRIMARY KEY(anime_id)
+);
+create table anime_brand(
+	anime_id int, brand_id int,
+	PRIMARY KEY(anime_id, brand_id)
+);
+create table brand(
+	brand_id int AUTO_INCREMENT, name varchar(32),
+	PRIMARY KEY(brand_id)
+);
+create table anime_writer(
+	anime_id int, writer_id int,
+	PRIMARY KEY(anime_id, writer_id)
+);
+create table writer(
+	writer_id int AUTO_INCREMENT, name varchar(32),
+	PRIMARY KEY(writer_id)
+);
+create table anime_director(
+	anime_id int, director_id int,
+	PRIMARY KEY(anime_id, director_id)
+);
+create table director(
+	director_id int AUTO_INCREMENT, name varchar(32),
+	PRIMARY KEY(director_id)
+);
+create table anime_op(
+	anime_id int, op_id int,
+	PRIMARY KEY(anime_id, op_id)
+);
+create table op(
+	op_id int AUTO_INCREMENT, name varchar(64), singer_id int,
+	PRIMARY KEY(op_id)
+);
+create table anime_ed(
+	anime_id int, ed_id int,
+	PRIMARY KEY(anime_id, ed_id)
+);
+create table ed(
+	ed_id int AUTO_INCREMENT, name varchar(64), singer_id int,
+	PRIMARY KEY(ed_id)
 );
 create table anime_actor(
 	anime_id int, actor_id int,
@@ -29,25 +67,17 @@ create table actor(
 	actor_id int AUTO_INCREMENT, name varchar(32), 
 	PRIMARY KEY(actor_id)
 ); 
-create table openingsong(
-	op varchar(64), singer_id int, 
-	PRIMARY KEY(op)
-);
-create table endingsong(
-	ed varchar(64), singer_id int, 
-	PRIMARY KEY(ed)
-);
 create table singer(
 	singer_id int AUTO_INCREMENT, name varchar(512), 
 	PRIMARY KEY(singer_id)
 );
+create table anime_broadcaster(
+	anime_id int, broadcaster_id int, weekday varchar(4), time varchar(16), 
+	PRIMARY KEY(anime_id, broadcaster_id)
+);
 create table broadcaster(
 	broadcaster_id int, name varchar(32), 
 	PRIMARY KEY(broadcaster_id)
-);
-create table broadcast_time(
-	anime_id int, broadcaster_id int, dayofweek varchar(4), time varchar(16), 
-	PRIMARY KEY(anime_id, broadcaster_id)
 );
 create table users(
 	uid int(10) AUTO_INCREMENT, user_name varchar(10), pass_hash varchar(20), 
