@@ -9,12 +9,13 @@ import tweepy
 
 class AniTimeTable:
 
+    URL = "http://cal.syoboi.jp"
+
     def __init__(self, time, broadcaster_list, CONSUMER_KEY="_", CONSUMER_SECRET="_", ACCESS_TOKEN="_", ACCESS_TOKEN_SECRET="_", DB_CONNECTION="_"):
         if not isinstance(time, datetime.datetime):
             sys.stderr.write('Error: usage: class initialized error: argment type is not datetime.datetime\n')
             return
         self.time = time
-        self.url = "http://cal.syoboi.jp"
         self.broadcaster = broadcaster_list
         auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -132,7 +133,7 @@ class AniTimeTable:
         return "_"
 
     def _return_soup(self, path):
-        response = requests.get(self.url + path)
+        response = requests.get(self.URL + path)
         if response.status_code == 404:
             sys.stderr.write('Error: usage: URL page notfound.\n')
             return
