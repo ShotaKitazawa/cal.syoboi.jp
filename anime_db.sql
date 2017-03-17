@@ -1,22 +1,5 @@
-drop table if exists anime;
-drop table if exists brand;
-drop table if exists anime_actor;
-drop table if exists actor;
-drop table if exists originwriter;
-drop table if exists director;
-drop table if exists openingsong;
-drop table if exists endingsong;
-drop table if exists songer;
-drop table if exists singer;
-drop table if exists broadcaster;
-drop table if exists broadcast_time;
-drop table if exists users;
-drop table if exists userreview;
-drop table if exists userhighlight;
-
 create table anime(
-	anime_id int, title varchar(64), 
-	official_site varchar(2083), official_twitter varchar(2083), 
+	anime_id int AUTO_INCREMENT, name varchar(64), 
 	PRIMARY KEY(anime_id)
 );
 create table anime_brand(
@@ -59,6 +42,10 @@ create table ed(
 	ed_id int AUTO_INCREMENT, name varchar(64), singer_id int,
 	PRIMARY KEY(ed_id)
 );
+create table singer(
+	singer_id int AUTO_INCREMENT, name varchar(512), 
+	PRIMARY KEY(singer_id)
+);
 create table anime_actor(
 	anime_id int, actor_id int,
 	PRIMARY KEY(anime_id, actor_id)
@@ -67,10 +54,6 @@ create table actor(
 	actor_id int AUTO_INCREMENT, name varchar(32), 
 	PRIMARY KEY(actor_id)
 ); 
-create table singer(
-	singer_id int AUTO_INCREMENT, name varchar(512), 
-	PRIMARY KEY(singer_id)
-);
 create table anime_broadcaster(
 	anime_id int, broadcaster_id int, weekday varchar(4), time varchar(16), 
 	PRIMARY KEY(anime_id, broadcaster_id)

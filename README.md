@@ -10,9 +10,19 @@ http://cal.syoboi.jp/ からスクレイピングします。
 	- requests (2.13.0)
 	- tweepy (3.5.0)
 
+# MEMO
+
+- anime_db.sql 使用時は事前にデータベースの再作成を行う。(DROP DATABASE anime; CREATE DATABASE anime;) 
+
+- 以下のコマンドで anime データベースにテーブルを自動で作成
+
+```
+mysql -uroot -p anime < anime_db.sql
+```
+
 # TODO
 
-- tweet に第何話かの情報を付ける
+- 完: tweet に第何話かの情報を付ける
 
 - 今季放送開始でないアニメのイメージファイルがどこにあるかがわからない
 	- 番組ID,番組名,番組イメージのpath のテーブルを作る。
@@ -20,7 +30,7 @@ http://cal.syoboi.jp/ からスクレイピングします。
 - xx分前のアニメをリストアップするメソッドの作成
 	- now_program メソッドを真似すればかんたん
 
-- insertdb.py を AniTimeTable のモジュール化
+- 完: insertdb.py を AniTimeTable のモジュール化
 
 - しょぼいカレンダー と あにぽた でアニメのタイトルが違うと困る。
 	- 優先度高
@@ -28,3 +38,5 @@ http://cal.syoboi.jp/ からスクレイピングします。
 		- 画像は [title] で google 画像検索して一番上の画像とか？
 		- insertdb の モジュール化をしちゃう
 		- anime_db.sql の見直し
+
+- 歌手名がキャラクター名であっても、その名前で DB に insert してしまう。
