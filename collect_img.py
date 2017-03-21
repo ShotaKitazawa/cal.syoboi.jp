@@ -6,19 +6,20 @@
 import sys
 import os
 import re
-import commands as cmd
+import subprocess as cmd
 
 
 # クエリ検索したHTMLの取得
 def get_HTML(query):
 
-    html = cmd.getstatusoutput("wget -O - https://www.bing.com/images/search?q=" + query)
+    html = cmd.check_output(["wget", "-O", "-", "https://www.bing.com/images/search?q={}".format(query)])
 
     return html
 
 
 
 # jpg画像のURLを抽出
+## TODO: url 配列に値が何も入らない
 def extract_URL(html):
 
     url = []
@@ -33,18 +34,18 @@ def extract_URL(html):
                 mtch = re.match(ptn, element[j])
                 if mtch >= 0:
                     url.append(mtch.group(1))
-
     return url
 
 
 
 # ローカルに画像を保存
-def get_IMG(dir, url):
+def get_IMG(directory, url):
 
     for u in url:
         try:
-            os.system("wget -P " + dir + " " + u)
+            cmd.check_output(["wget", "-P", directory, u])
         except:
+            print("error")
             continue
 
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     argvs = sys.argv  # argvs[1]: 画像検索のクエリ, argvs[2]: 保存先のディレクトリ(保存したい時のみ)
     query = argvs[1]  # some images  e.g. leopard
 
-    html = get_HTML(query)
+    html = str(get_HTML(query))
 
     url = extract_URL(html)
 
