@@ -54,7 +54,6 @@ class AniTimeTable:
                 try:
                     staff_list = soup.find_all("table", {"class": "section staff"})
                     c = self.connection.cursor()
-                    # TODO: anime テーブルで名前被っとるぞ
                     if self._check_table(title, "anime"):
                         c.execute('insert into anime(name) values("{}")'.format(title))
                     c.close()
