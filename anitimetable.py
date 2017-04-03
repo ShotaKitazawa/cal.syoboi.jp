@@ -13,7 +13,7 @@ class AniTimeTable:
 
     def __init__(self, time, broadcaster_list, CONSUMER_KEY="_", CONSUMER_SECRET="_", ACCESS_TOKEN="_", ACCESS_TOKEN_SECRET="_", DB_CONNECTION="_"):
         if not isinstance(time, datetime.datetime):
-            sys.stderr.write('Error: usage: class initialized error: argment type is not datetime.datetime\n')
+            sys.stderr.write('Error: class initialized error: argment type is not datetime.datetime\n')
             return
         self.time = time
         self.broadcaster = broadcaster_list
@@ -29,6 +29,8 @@ class AniTimeTable:
             sys.stdout.write(program["title"] + "\n")
 
     def insert_db(self):
+        if self.connection == "_":
+            sys.stderr.write('Error: database not initialized')
         titlelist_id = {
             "1",  # 放送中アニメ
             # "2", # ラジオ
@@ -45,6 +47,7 @@ class AniTimeTable:
             title_url = title_list.find_all("a")
             for j in title_url:
                 title = j.text
+                self._download_image(title)
                 print("== " + title + " ==")
                 soup = self._return_soup(j["href"])
                 try:
@@ -175,7 +178,7 @@ class AniTimeTable:
     def _return_soup(self, path):
         response=requests.get(self.URL + path)
         if response.status_code == 404:
-            sys.stderr.write('Error: usage: URL page notfound.\n')
+            sys.stderr.write('Error: URL page notfound.\n')
             return
         html=response.text.encode('utf-8', 'ignore')
         return BeautifulSoup(html, "lxml")
@@ -199,7 +202,7 @@ class AniTimeTable:
             c.close()
             return values
         except:
-            sys.stderr.write("Error: usage: Database cant connected\n")
+            sys.stderr.write("Error: Database cant connected\n")
             return
 
     def _check_weekday(self):
