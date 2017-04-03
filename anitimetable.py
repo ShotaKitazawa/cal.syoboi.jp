@@ -93,6 +93,9 @@ class AniTimeTable:
                         sys.stdout.write(title + "\n" + broadcaster_check + ": " + weekday + " " + atime + "\n" + ordinal + message + "\n")
                         print("===")
 
+    def _download_image(self, title):
+        pass
+
     def _tidpage_section_insert(self, sections, title, insertlists):
         for i in sections:
             for j in insertlists:
