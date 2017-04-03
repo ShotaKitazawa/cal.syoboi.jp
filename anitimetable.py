@@ -48,12 +48,13 @@ class AniTimeTable:
             title_url = title_list.find_all("a")
             for j in title_url:
                 title = j.text
-                self._download_image(title)
+                self._search_and_download_image(title)
                 print("== " + title + " ==")
                 soup = self._return_soup(j["href"])
                 try:
                     staff_list = soup.find_all("table", {"class": "section staff"})
                     c = self.connection.cursor()
+                    # TODO: anime テーブルで名前被っとるぞ
                     if self._check_table(title, "anime"):
                         c.execute('insert into anime(name) values("{}")'.format(title))
                     c.close()
@@ -63,13 +64,15 @@ class AniTimeTable:
 
                     op_list = soup.find_all("table", {"class": "section op"})
                     for ops in op_list:
-                        op_title = ops.find("div", {"class": "title"}).text
+                        op_title_source = ops.find("div", {"class": "title"}).text
+                        op_title = re.sub(r"^.*?「(.*)」$", r"\1", op_title_source)
                         op_data = ops.find("table", {"class": "data"}).find_all("tr")
                         self._tidpage_section_insert(op_data, title, [["歌", "op", op_title]])
 
                     ed_list = soup.find_all("table", {"class": "section ed"})
                     for eds in ed_list:
-                        ed_title = eds.find("div", {"class": "title"}).text
+                        ed_title_source = eds.find("div", {"class": "title"}).text
+                        ed_title = re.sub(r"^.*?「(.*)」$", r"\1", ed_title_source)
                         ed_data = eds.find("table", {"class": "data"}).find_all("tr")
                         self._tidpage_section_insert(ed_data, title, [["歌", "ed", ed_title]])
                 except Exception as error:
@@ -93,8 +96,19 @@ class AniTimeTable:
                         sys.stdout.write(title + "\n" + broadcaster_check + ": " + weekday + " " + atime + "\n" + ordinal + message + "\n")
                         print("===")
 
-    def _download_image(self, title):
-        pass
+    def _search_and_download_image(self, title):
+        response = requests.get("https://search.yahoo.co.jp/image/search?p={0}&ei=UTF-8&rkf=1".format(title))
+        if response.status_code == 404:
+            sys.stderr.write('Error: URL page notfound.\n')
+            sys.exit(1)
+        html = response.text.encode("utf-8", "ignore")
+        soup = BeautifulSoup(html, "lxml")
+        content = soup.find("div", {"id": "contents"})
+        image_url = content.find("img")["src"]
+        image = requests.get(image_url)
+        with open("{0}/.images/{1}.jpg".format(os.path.expanduser('~'), title), 'wb') as myfile:
+            for chunk in image.iter_content(chunk_size=1024):
+                myfile.write(chunk)
 
     def _tidpage_section_insert(self, sections, title, insertlists):
         for i in sections:
@@ -143,7 +157,8 @@ class AniTimeTable:
     def _check_table(self, content, table):
         c = self.connection.cursor()
         c.execute('select * from {0} where name="{1}"'.format(table, content))
-        if len(c.fetchall()) == 0:
+        tmp = c.fetchall()
+        if len(tmp) == 0:
             return True
         else:
             return False
