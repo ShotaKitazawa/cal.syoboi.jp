@@ -37,7 +37,6 @@ mysql -uroot -p anime < anime_db.sql
 	- しょぼいカレンダー からデータベースにinsertする情報も取ってくる
 		- 画像は [title] で google 画像検索して一番上の画像とか？
 			- yahoo 検索
-		- insertdb の モジュール化をしちゃう
 		- anime_db.sql の見直し
 
 - 歌手名がキャラクター名であっても、その名前で DB に insert してしまう。
