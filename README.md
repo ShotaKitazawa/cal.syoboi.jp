@@ -1,3 +1,5 @@
+**Do not maintain any more**
+
 # About
 
 http://cal.syoboi.jp/ からスクレイピングします。
